@@ -19,6 +19,7 @@ Shadow
      :alt: Updates
 
 
+.. image:: shadow-devil.gif
 
 A comprehensive command line utility to render templates and ease code generation.
 
@@ -26,6 +27,7 @@ A comprehensive command line utility to render templates and ease code generatio
 * Free software: GNU General Public License v3
 * Documentation: https://shadow.readthedocs.io.
 
+.. contents::
 
 Features
 --------
