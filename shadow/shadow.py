@@ -1,3 +1,8 @@
 # -*- coding: utf-8 -*-
 
-"""Main module."""
+"""Shadow Renderer Facade"""
+
+
+class Shadow:
+    def __init__(self, *args, **kwargs):
+        pass
