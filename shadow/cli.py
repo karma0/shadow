@@ -66,10 +66,11 @@ def main(version):
 @click.option('-q', '--quiet', is_flag=True, help='Suppress all but critical '
               'output')
 @click.argument('files', nargs=-1, type=click.Path(exists=True))
-def sim(environment, configfile, verbose, quiet, files):
+def sim(tmplextension, verbose, quiet, files):
     """Show the files that would get rendered."""
-    shadow = Shadow()
-    for tmpl in shadow.find_templates(*files):
+    shadow = Shadow(files)
+    #shadow.discovery.discover_paths()
+    for tmpl in shadow.run():
         click.echo(tmpl)
     return 0
 
@@ -86,14 +87,14 @@ def sim(environment, configfile, verbose, quiet, files):
 @click.option('-q', '--quiet', is_flag=True, help='Suppress all but critical '
               'output')
 @click.argument('files', nargs=-1, type=click.Path(exists=True))
-def fax(environment, configfile, verbose, quiet, files):
+def fax(environment, configfile, tmplextension, verbose, quiet, files):
     """Render the current tree."""
     config = None
     if environment:
         config = os.environ.copy()
 
     shadow = Shadow(config=config, configfile=configfile)
-    shadow.find_templates(*files)
+    shadow.discovery.discover_paths(*files)
     shadow.run()
     return 0
 

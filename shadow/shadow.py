@@ -21,11 +21,12 @@ class MyConfigParser(ConfigParser):
 class Shadow:
     files = None
 
-    def __init__(self, config=None, configfile='shadowconf.json',
+    def __init__(self, paths=None, config=None, configfile='shadowconf.json',
                  tmplext='.tpl'):
+        self.paths = [] if paths is None else paths
         self.config = config
         self.configfile = configfile
-        self.discovery = Explorer(tmplext)
+        self.discovery = Explorer(paths=self.paths, tmplext=tmplext)
 
     def load_config(self):
         with open(self.configfile, 'r') as fh:
@@ -56,16 +57,12 @@ class Shadow:
                 ini.readfp(StringIO(fh.read()))
                 self.config = ini.as_dict()
 
-    def find_templates(self, *paths):
-        if paths:
-            for path in paths:
-                if os.path.isdir(path):
-                    if path.endswith(self.template_ext):
-                        
-
     def run(self):
-        if self.config is None:
-            self.load_config()
+        #if self.config is None:
+        #    self.load_config()
 
         if self.files is None:
-            self.find_templates()
+            self.discovery.discover_paths()
+            self.files = self.discovery.pull_records()
+
+        return self.files
