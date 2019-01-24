@@ -3,10 +3,21 @@
 """Shadow Renderer Facade"""
 
 import re
+import os
+import logging
+
+from collections import namedtuple
 from io import StringIO
 from configparser import ConfigParser
 
 from shadow.search import Explorer
+from shadow.renderer import Renderer
+
+
+logger = logging.getLogger('shadow')
+
+
+Template = namedtuple('Template', 'source destination')
 
 
 class MyConfigParser(ConfigParser):
@@ -20,12 +31,14 @@ class MyConfigParser(ConfigParser):
 
 class Shadow:
     files = None
+    configfile = 'shadowconf.json'
 
-    def __init__(self, paths=None, config=None, configfile='shadowconf.json',
+    def __init__(self, paths=None, config=None, configfile=None,
                  tmplext='.tpl'):
         self.paths = [] if paths is None else paths
         self.config = config
-        self.configfile = configfile
+        if configfile is not None:
+            self.configfile = configfile
         self.discovery = Explorer(paths=self.paths, tmplext=tmplext)
 
     def load_config(self):
@@ -58,11 +71,21 @@ class Shadow:
                 self.config = ini.as_dict()
 
     def run(self):
-        #if self.config is None:
-        #    self.load_config()
+        if self.config is None:
+            try:
+                self.load_config()
+            except FileNotFoundError:
+                logger.warning(f"No config file present; using shell "
+                    "environment.")
+                self.config = os.environ.copy()
 
         if self.files is None:
             self.discovery.discover_paths()
-            self.files = self.discovery.pull_records()
+            self.files = (Template(*pair) for pair in
+                            self.discovery.pull_records())
 
         return self.files
+
+    def render(self):
+        renderer = Renderer(self.config, self.files)
+        return renderer.render()

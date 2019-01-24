@@ -48,8 +48,9 @@ def main(version):
         directory on files ending in *.j2, using environment variables to
         fill and render the templates.
 
-        ``shadow fax -c test.txt.hcl test.txt.tpl`` - Generate the single template file
-        named ``test.txt`` using the HCL config file ``test.txt.hcl``.
+        ``shadow fax -c test.txt.hcl test.txt.tpl`` - Generate the single
+        template file named ``test.txt`` using the HCL config file
+        ``test.txt.hcl``.
     """
     if version:
         click.echo(__version__)
@@ -68,10 +69,32 @@ def main(version):
 @click.argument('files', nargs=-1, type=click.Path(exists=True))
 def sim(tmplextension, verbose, quiet, files):
     """Show the files that would get rendered."""
-    shadow = Shadow(files)
-    #shadow.discovery.discover_paths()
+    setup_logger(quiet, verbose)
+
+    shadow = Shadow(files, tmplext=tmplextension)
     for tmpl in shadow.run():
-        click.echo(tmpl)
+        click.echo("Generating template: "
+                   f"{tmpl.source}; output as: {tmpl.destination}")
+    return 0
+
+
+@main.command(context_settings={"ignore_unknown_options": True})
+@click.option('-t', '--tmplextension', help='The extension that templates '
+              'can be identified with')
+@click.option('-v', '--verbose', count=True, help='Increase verbosity; use '
+              'multiple times to increase verbosity')
+@click.option('-q', '--quiet', is_flag=True, help='Suppress all but critical '
+              'output')
+@click.argument('files', nargs=-1, type=click.Path(exists=True))
+def clean(tmplextension, verbose, quiet, files):
+    """Show the files that would get rendered."""
+    setup_logger(quiet, verbose)
+
+    shadow = Shadow(files, tmplext=tmplextension)
+    for tmpl in shadow.run():
+        if os.path.exists(tmpl[1]):
+            click.echo(f"Cleaning generated file: {tmpl.destination}")
+            os.remove(tmpl[1])
     return 0
 
 
@@ -81,7 +104,7 @@ def sim(tmplextension, verbose, quiet, files):
 @click.option('-c', '--configfile', help='Configuration (ini, json, hcl, or '
               'env file)')
 @click.option('-t', '--tmplextension', help='The extension that templates '
-              'can be identified with')
+              'can be identified with', default='.tpl')
 @click.option('-v', '--verbose', count=True, help='Increase verbosity; use '
               'multiple times to increase verbosity')
 @click.option('-q', '--quiet', is_flag=True, help='Suppress all but critical '
@@ -93,9 +116,12 @@ def fax(environment, configfile, tmplextension, verbose, quiet, files):
     if environment:
         config = os.environ.copy()
 
-    shadow = Shadow(config=config, configfile=configfile)
-    shadow.discovery.discover_paths(*files)
-    shadow.run()
+    setup_logger(quiet, verbose)
+
+    shadow = Shadow(config=config, configfile=configfile, tmplext=tmplextension)
+    for tmpl in shadow.run():
+        click.echo("Generating template: "
+                   f"{tmpl.source}; output as: {tmpl.destination}")
     return 0
 
 

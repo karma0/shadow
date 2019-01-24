@@ -3,7 +3,6 @@
 """Template Discovery Module"""
 
 import os
-import types
 import logging
 
 
@@ -14,7 +13,7 @@ class Cabinet:
     _dest = None
 
     def __init__(self, path, tmplext='.tpl'):
-        logger.error(f"New Cabinet at {path}")
+        logger.debug(f"New Cabinet at {path}")
         self.source = path
         self.tmplext = tmplext
 
@@ -43,8 +42,9 @@ class Folder(Cabinet):
 class Drawer(Cabinet):
     records: list = []
 
-    def create_file_list(self):
-        logger.error(f"Creating Drawer for source: {self.source}")
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        logger.debug(f"Creating Drawer for source: {self.source}")
         for dirpath, dirnames, filenames in \
                 os.walk(self.source, followlinks=False):
             destpath = f"{self.dest}{dirpath[len(self.source):]}"
@@ -60,8 +60,10 @@ class Drawer(Cabinet):
                 self.records[-1].dest = os.path.join(destpath, fname)
 
     def pull(self):
-        for rec in self.records:
-            yield rec.pull()
+        return (rec.pull() for rec in self.records)
+
+    def __repr__(self):
+        return f"<Drawer with {len(self.records)} in it>"
 
 
 class Explorer:
@@ -69,7 +71,7 @@ class Explorer:
     excludes: list = []
 
     def __init__(self, paths=None, tmplext=None):
-        logger.error(f"New Explorer at paths: {paths}")
+        logger.debug(f"New Explorer at paths: {paths}")
 
         if (not paths and paths is not None) or paths is None:
             self.paths = ['.']
@@ -95,12 +97,9 @@ class Explorer:
         for record in self.records:
             if isinstance(record, Drawer):
                 for rec in record.pull():
-                    logger.error(f"GENERATED ITEM! {rec}")
                     yield rec
             else:
-                logger.error(f"NOT GENERATOR! {record}")
                 yield record.pull()
-
 
     def walk(self, source):
         for dirpath, dirnames, filenames in \
