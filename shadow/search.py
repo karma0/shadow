@@ -73,7 +73,8 @@ class Explorer:
     def __init__(self, paths=None, tmplext=None):
         logger.debug(f"New Explorer at paths: {paths}")
 
-        if (not paths and paths is not None) or paths is None:
+        if not paths or paths is None:
+            logger.warning(f"Using current working directory")
             self.paths = ['.']
         else:
             self.paths = paths

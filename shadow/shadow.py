@@ -81,11 +81,11 @@ class Shadow:
 
         if self.files is None:
             self.discovery.discover_paths()
-            self.files = (Template(*pair) for pair in
-                            self.discovery.pull_records())
+            self.files = [Template(*pair) for pair in
+                            self.discovery.pull_records()]
 
         return self.files
 
     def render(self):
-        renderer = Renderer(self.config, self.files)
+        renderer = Renderer(self.files, self.config)
         return renderer.render()

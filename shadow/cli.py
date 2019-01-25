@@ -118,10 +118,11 @@ def fax(environment, configfile, tmplextension, verbose, quiet, files):
 
     setup_logger(quiet, verbose)
 
-    shadow = Shadow(config=config, configfile=configfile, tmplext=tmplextension)
+    shadow = Shadow(paths=files, config=config, configfile=configfile, tmplext=tmplextension)
     for tmpl in shadow.run():
         click.echo("Generating template: "
                    f"{tmpl.source}; output as: {tmpl.destination}")
+    shadow.render()
     return 0
 
 
