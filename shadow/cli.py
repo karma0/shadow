@@ -102,7 +102,7 @@ def clean(tmplextension, verbose, quiet, files):
 @click.option('-e', '--environment', is_flag=True, help='Import the '
               'environment for template variable resolution')
 @click.option('-c', '--configfile', help='Configuration (ini, json, hcl, or '
-              'env file)')
+        'env file). Default: shadowconf.<extension>')
 @click.option('-t', '--tmplextension', help='The extension that templates '
               'can be identified with', default='.tpl')
 @click.option('-v', '--verbose', count=True, help='Increase verbosity; use '

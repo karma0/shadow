@@ -31,14 +31,33 @@ class MyConfigParser(ConfigParser):
 
 class Shadow:
     files = None
-    configfile = 'shadowconf.json'
+    config = {}
+
+    # possible config files
+    configfiles = [
+        'shadowconf.json',
+        'shadowconf.hcl',
+        'shadowconf.env',
+        'shadowconf.ini'
+    ]
+    configfile = None
 
     def __init__(self, paths=None, config=None, configfile=None,
                  tmplext='.tpl'):
         self.paths = [] if paths is None else paths
         self.config = config
-        if configfile is not None:
+        logger.warning(f"Using config file: {configfile}")
+
+        # Search for valid configuration files
+        if configfile is None:
+            for file in reversed(self.configfiles):
+                if os.path.exists(file):
+                    logger.info(f"Using config file: {file}")
+                    self.configfile = file
+        else:
+            logger.warning(f"Using config file: {file}")
             self.configfile = configfile
+
         self.discovery = Explorer(paths=self.paths, tmplext=tmplext)
 
     def load_config(self):
@@ -55,7 +74,6 @@ class Shadow:
             elif ".env" in self.configfile:
                 envre = re.compile(r'''^([^\s=]+)=(?:[\s"']*)(.+?)(?:[\s"']*)$''')
 
-                self.config = {}
                 for line in fh.readlines():
                     match = envre.match(line)
                     if match is not None:
@@ -70,8 +88,13 @@ class Shadow:
                 ini.readfp(StringIO(fh.read()))
                 self.config = ini.as_dict()
 
+            else:
+                raise FileNotFoundError
+
+            logger.info(f"Using config: {self.config}")
+
     def run(self):
-        if self.config is None:
+        if not self.config or self.config is None:
             try:
                 self.load_config()
             except FileNotFoundError:

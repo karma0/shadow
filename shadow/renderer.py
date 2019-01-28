@@ -3,7 +3,7 @@
 import os
 import logging
 
-from jinja2 import Template
+from jinja2 import Template, Environment, BaseLoader
 
 
 logger = logging.getLogger('shadow')
@@ -16,17 +16,21 @@ class Renderer:
 
     def render(self):
         for tmpl in self.tmpls:
-            if os.path.isdir(tmpl.source) and not os.path.isdir(tmpl.destination):
-                logger.warning(f"Creating path: {tmpl.destination}")
-                os.makedirs(tmpl.destination)
-            else:
-                logger.warning(f"Rendering {tmpl.source} to {tmpl.destination}")
-                directory = os.path.dirname(tmpl.destination)
-                if directory and not os.path.isdir(directory):
-                    os.makedirs(directory)
-                self.save_template(tmpl.destination,
-                                   self.get_template(tmpl.source),
-                                   **self.config)
+            for destination in self.render_path(tmpl):
+                if os.path.isdir(tmpl.source) and not os.path.isdir(destination):
+                    logger.warning(f"Creating path: {tmpl.destination}")
+                    os.makedirs(destination)
+                else:
+                    logger.warning(f"Rendering {tmpl.source} to {destination}")
+                    directory = os.path.dirname(destination)
+                    if directory and not os.path.isdir(directory):
+                        os.makedirs(directory)
+                    self.save_template(destination,
+                                       self.get_template(tmpl.source),
+                                       **self.config)
+
+    def render_path(self, tmpl):
+        rtemplate = Environment(loader=BaseLoader()).from_string(tmpl.destination)
 
     def get_template(self, filename):
         with open(filename, 'r') as fh:
