@@ -4,34 +4,37 @@
 
 import re
 import os
-import logging
 
 from collections import namedtuple
 from io import StringIO
 from configparser import ConfigParser
 
+from shadow.log import logger
 from shadow.search import Explorer
 from shadow.renderer import Renderer
 
 
-logger = logging.getLogger('shadow')
-
-
 Template = namedtuple('Template', 'source destination')
+"""Template object for housing source/destination pairs of template files."""
 
 
 class MyConfigParser(ConfigParser):
+    """ConfigParser for parsing *.ini files"""
     def as_dict(self):
-        d = dict(self._sections)
-        for k in d:
-            d[k] = dict(self._defaults, **d[k])
-            d[k].pop('__name__', None)
-        return d
+        """Generate and return the configuration as a dictionary object"""
+        sections = dict(self._sections)
+        for key in sections:
+            sections[key] = dict(self._defaults, **sections[key])
+            sections[key].pop('__name__', None)
+        return sections
 
 
 class Shadow:
+    """Application class for orchestrating the various pieces and providing a
+    functional facade.
+    """
     files = None
-    config = {}
+    config: dict = {}
 
     # possible config files
     configfiles = [
@@ -61,31 +64,35 @@ class Shadow:
         self.discovery = Explorer(paths=self.paths, tmplext=tmplext)
 
     def load_config(self):
-        with open(self.configfile, 'r') as fh:
+        """Open and load the config file using it's file format as determined by
+        filename extension.
+        """
+        with open(self.configfile, 'r') as handle:
 
             if ".json" in self.configfile:
                 import json
-                self.config = json.loads(fh.read())
+                self.config = json.loads(handle.read())
 
             elif ".hcl" in self.configfile:
                 import hcl
-                self.config = hcl.load(fh)
+                self.config = hcl.load(handle)
 
             elif ".env" in self.configfile:
-                envre = re.compile(r'''^([^\s=]+)=(?:[\s"']*)(.+?)(?:[\s"']*)$''')
+                envre = \
+                    re.compile(r'''^([^\s=]+)=(?:[\s"']*)(.+?)(?:[\s"']*)$''')
 
-                for line in fh.readlines():
+                for line in handle.readlines():
                     match = envre.match(line)
                     if match is not None:
                         self.config[match.group(1)] = match.group(2)
 
             elif ".yml" in self.configfile:
                 import yaml
-                self.config = yaml.load(fh.read())
+                self.config = yaml.load(handle.read())
 
             elif ".ini" in self.configfile:
                 ini = MyConfigParser()
-                ini.readfp(StringIO(fh.read()))
+                ini.readfp(StringIO(handle.read()))
                 self.config = ini.as_dict()
 
             else:
@@ -94,21 +101,23 @@ class Shadow:
             logger.info(f"Using config: {self.config}")
 
     def run(self):
+        """Execute the application as configured, without generating output"""
         if not self.config or self.config is None:
             try:
                 self.load_config()
             except FileNotFoundError:
-                logger.warning(f"No config file present; using shell "
-                    "environment.")
+                logger.warning(
+                    "No config file present; using shell environment.")
                 self.config = os.environ.copy()
 
         if self.files is None:
             self.discovery.discover_paths()
             self.files = [Template(*pair) for pair in
-                            self.discovery.pull_records()]
+                          self.discovery.pull_records()]
 
         return self.files
 
     def render(self):
+        """Render the discovered templates"""
         renderer = Renderer(self.files, self.config)
         return renderer.render()

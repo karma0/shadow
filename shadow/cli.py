@@ -4,22 +4,10 @@
 import os
 import sys
 import click
-import logging
 
 from shadow import __version__
 from shadow.shadow import Shadow
-
-
-def setup_logger(quiet, verbose):
-    logger = logging.getLogger('shadow')
-    if quiet:
-        logger.setLevel(logging.ERROR)
-    else:
-        logger.setLevel([
-            logging.WARNING,
-            logging.INFO,
-            logging.DEBUG,
-        ][verbose])
+from shadow.log import setup_logger
 
 
 @click.group()
@@ -42,7 +30,7 @@ def main(version):
         and generate them using the config file ``shadowconf.json`` as the
         variables to build them.
 
-        ``shadow reset`` - Find all generated templates and remove them.
+        ``shadow clean`` - Find all generated templates and remove them.
 
         ``shadow fax -e -t .j2 tests`` - Generate templates in the ``tests``
         directory on files ending in *.j2, using environment variables to
@@ -102,7 +90,7 @@ def clean(tmplextension, verbose, quiet, files):
 @click.option('-e', '--environment', is_flag=True, help='Import the '
               'environment for template variable resolution')
 @click.option('-c', '--configfile', help='Configuration (ini, json, hcl, or '
-        'env file). Default: shadowconf.<extension>')
+              'env file). Default: shadowconf.<extension>')
 @click.option('-t', '--tmplextension', help='The extension that templates '
               'can be identified with', default='.tpl')
 @click.option('-v', '--verbose', count=True, help='Increase verbosity; use '
@@ -118,11 +106,11 @@ def fax(environment, configfile, tmplextension, verbose, quiet, files):
 
     setup_logger(quiet, verbose)
 
-    shadow = Shadow(paths=files, config=config, configfile=configfile, tmplext=tmplextension)
-    for tmpl in shadow.run():
-        click.echo("Generating template: "
-                   f"{tmpl.source}; output as: {tmpl.destination}")
+    shadow = Shadow(paths=files, config=config, configfile=configfile,
+                    tmplext=tmplextension)
+    shadow.run()
     shadow.render()
+
     return 0
 
 

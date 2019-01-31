@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 
-"""Template Discovery Module"""
+"""Template Search and Discovery Module"""
 
 import os
-import logging
 
-
-logger = logging.getLogger('shadow')
+from shadow.log import logger
 
 
 class Cabinet:
+    """A base class for encapsulating functionality within a File, Folder, or
+    Drawer object.
+    """
     _dest = None
 
     def __init__(self, path, tmplext='.tpl'):
@@ -18,28 +19,36 @@ class Cabinet:
         self.tmplext = tmplext
 
     def pull(self):
+        """Return the source/destination"""
         return (self.source, self.dest)
 
     @property
     def dest(self):
+        """Return the destination, computing and removing the template
+        extension.
+        """
         if self._dest is None:
             self._dest = self.source[:-len(self.tmplext)]
         return self._dest
 
     @dest.setter
     def dest(self, value):
+        """Set the destination"""
         self._dest = value
 
 
 class File(Cabinet):
+    """A File class"""
     pass
 
 
 class Folder(Cabinet):
+    """A Folder class"""
     pass
 
 
 class Drawer(Cabinet):
+    """A collection of Files and Folders"""
     records: list = []
 
     def __init__(self, *args, **kwargs):
@@ -63,10 +72,11 @@ class Drawer(Cabinet):
         return (rec.pull() for rec in self.records)
 
     def __repr__(self):
-        return f"<Drawer with {len(self.records)} in it>"
+        return f"<Drawer with {len(self.records)} records in it>"
 
 
 class Explorer:
+    """Cabinet and Drawer facade for discovering records on disk"""
     records: list = []
     excludes: list = []
 
@@ -82,6 +92,7 @@ class Explorer:
         self.tmplext = '.tpl' if tmplext is None else tmplext
 
     def discover_paths(self):
+        """Search the paths for templates, walking the tree as necessary"""
         for path in self.paths:
             if os.path.isdir(path):
                 if path.endswith(self.tmplext):
@@ -95,6 +106,7 @@ class Explorer:
                 logger.warning(f"Unknown path: {path}")
 
     def pull_records(self):
+        """Yield (source, destination) tuples"""
         for record in self.records:
             if isinstance(record, Drawer):
                 for rec in record.pull():
@@ -103,6 +115,9 @@ class Explorer:
                 yield record.pull()
 
     def walk(self, source):
+        """Walking the tree to search the paths for templates. If a directory
+        ends with the template extension, add all files under it.
+        """
         for dirpath, dirnames, filenames in \
                 os.walk(source, followlinks=False):
 
