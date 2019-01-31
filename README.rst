@@ -18,16 +18,14 @@ Shadow
      :target: https://pyup.io/repos/github/karma0/shadow/
      :alt: Updates
 
-
-.. image:: shadow-devil.gif
-
 A comprehensive command line utility to render templates and ease code generation.
 
 
 * Free software: GNU General Public License v3
 * Documentation: https://shadow.readthedocs.io.
 
-.. contents::
+
+.. image:: https://github.com/karma0/shadow/blob/master/shadow-devil.gif
 
 Features
 --------
@@ -45,6 +43,19 @@ Features
 * If no configuration file is specified, it will load and use the shell
   environment to render variables.
 * All defaults can be overriden.
+
+Install
+-------
+
+Install from PyPi::
+
+    pip install shadow-cli
+
+Install from GitHub::
+
+    git clone https://github.com/karma0/shadow
+    cd shadow
+    pip install -U .
 
 Examples
 --------
