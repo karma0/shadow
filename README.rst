@@ -48,26 +48,33 @@ Features
 
 Examples
 --------
+
 Display the help and exit::
+
     shadow --help
 
 Discover templates to be generated::
+
     shadow sim
 
 Find all templates in the current working directory
 and generate them using the config file ``shadowconf.json`` as the
-variables to build them.::
+variables to build them::
+
     shadow fax
 
 Find all generated templates and remove them::
+
     shadow clean
 
-Generate templates in the ``tests`` directory on files ending in *.j2, using
+Generate templates in the ``tests`` directory on files ending in ``*.j2``, using
 environment variables to fill and render the templates::
+
     shadow fax -e -t .j2 tests
 
 Generate the single template file named ``test.txt`` using the HCL config file
 ``test.txt.hcl``::
+
     shadow fax -c test.txt.hcl test.txt.tpl
 
 

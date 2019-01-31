@@ -19,7 +19,7 @@ Template = namedtuple('Template', 'source destination')
 
 
 class MyConfigParser(ConfigParser):
-    """ConfigParser for parsing *.ini files"""
+    """ConfigParser for parsing ``*.ini`` files"""
     def as_dict(self):
         """Generate and return the configuration as a dictionary object"""
         sections = dict(self._sections)
