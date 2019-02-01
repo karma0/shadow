@@ -11,3 +11,8 @@ History
 ------------------
 
 * Version bump; getting everything working.
+
+0.2.2 (2019-01-31)
+------------------
+
+* Documentation fixes.
