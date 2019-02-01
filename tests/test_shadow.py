@@ -7,7 +7,7 @@ import pytest
 
 from click.testing import CliRunner
 
-from shadow import shadow
+from shadow.shadow import Shadow
 from shadow import cli
 
 
@@ -27,7 +27,7 @@ def test_cli_sim():
     runner = CliRunner()
     result = runner.invoke(cli.main, ['sim'])
     assert result.exit_code == 0
-    assert 'Using current working directory' in result.output
+    assert 'Using current working directory.' in result.output
 
 
 def test_cli_fax():
@@ -35,7 +35,7 @@ def test_cli_fax():
     runner = CliRunner()
     result = runner.invoke(cli.main, ['fax'])
     assert result.exit_code == 0
-    assert 'Using current working directory' in result.output
+    assert 'Using current working directory.' in result.output
 
 
 def test_cli_clean():
@@ -43,4 +43,4 @@ def test_cli_clean():
     runner = CliRunner()
     result = runner.invoke(cli.main, ['clean'])
     assert result.exit_code == 0
-    assert 'Using current working directory' in result.output
+    assert 'Using current working directory.' in result.output
