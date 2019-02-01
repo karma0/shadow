@@ -3,8 +3,8 @@ Shadow
 ======
 
 
-.. image:: https://img.shields.io/pypi/v/shadow.svg
-        :target: https://pypi.python.org/pypi/shadow
+.. image:: https://img.shields.io/pypi/v/shadow-cli.svg
+        :target: https://pypi.python.org/pypi/shadow-cli
 
 .. image:: https://img.shields.io/travis/karma0/shadow.svg
         :target: https://travis-ci.org/karma0/shadow
@@ -25,7 +25,7 @@ A comprehensive command line utility to render templates and ease code generatio
 * Documentation: https://shadow.readthedocs.io.
 
 
-.. image:: https://github.com/karma0/shadow/blob/master/shadow-devil.gif
+.. image:: https://github.com/karma0/shadow/raw/master/shadow-devil.gif
 
 Features
 --------
@@ -44,8 +44,8 @@ Features
   environment to render variables.
 * All defaults can be overriden.
 
-Install
--------
+Quick Install
+-------------
 
 Install from PyPi::
 
