@@ -49,7 +49,6 @@ class Shadow:
                  tmplext='.tpl'):
         self.paths = [] if paths is None else paths
         self.config = config
-        logger.warning(f"Using config file: {configfile}")
 
         # Search for valid configuration files
         if configfile is None:
@@ -57,6 +56,10 @@ class Shadow:
                 if os.path.exists(file):
                     logger.info(f"Using config file: {file}")
                     self.configfile = file
+            if configfile is None:
+                logger.info("No config file present; using environment")
+                self.config = os.environ
+
         else:
             logger.warning(f"Using config file: {file}")
             self.configfile = configfile
