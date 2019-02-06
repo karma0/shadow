@@ -60,7 +60,7 @@ def sim(tmplextension, verbose, quiet, files):
     setup_logger(quiet, verbose)
 
     shadow = Shadow(files, tmplext=tmplextension)
-    for tmpl in shadow.run():
+    for tmpl in shadow.search():
         click.echo("Generating template: "
                    f"{tmpl.source}; output as: {tmpl.destination}")
     return 0
@@ -79,7 +79,7 @@ def clean(tmplextension, verbose, quiet, files):
     setup_logger(quiet, verbose)
 
     shadow = Shadow(files, tmplext=tmplextension)
-    for tmpl in shadow.run():
+    for tmpl in shadow.search():
         if os.path.exists(tmpl[1]):
             click.echo(f"Cleaning generated file: {tmpl.destination}")
             os.remove(tmpl[1])
@@ -106,10 +106,8 @@ def fax(environment, configfile, tmplextension, verbose, quiet, files):
 
     setup_logger(quiet, verbose)
 
-    shadow = Shadow(paths=files, config=config, configfile=configfile,
-                    tmplext=tmplextension)
+    shadow = Shadow(files, config, configfile, tmplextension)
     shadow.run()
-    shadow.render()
 
     return 0
 

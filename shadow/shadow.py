@@ -50,21 +50,29 @@ class Shadow:
         self.paths = [] if paths is None else paths
         self.config = config
 
+        if config is None:
+            self.find_config(configfile)
+
+        self.discovery = Explorer(paths=self.paths, tmplext=tmplext)
+
+    def find_config(self, configfile):
         # Search for valid configuration files
         if configfile is None:
             for file in reversed(self.configfiles):
                 if os.path.exists(file):
                     logger.info(f"Using config file: {file}")
                     self.configfile = file
-            if configfile is None:
+
+            if configfile is None:  # Still not found to be present
                 logger.info("No config file present; using environment")
-                self.config = os.environ
+                self.load_env()
 
         else:
             logger.warning(f"Using config file: {file}")
             self.configfile = configfile
 
-        self.discovery = Explorer(paths=self.paths, tmplext=tmplext)
+    def load_env(self):
+        self.config = os.environ.copy()
 
     def load_config(self):
         """Open and load the config file using it's file format as determined by
@@ -103,7 +111,7 @@ class Shadow:
 
             logger.info(f"Using config: {self.config}")
 
-    def run(self):
+    def search(self):
         """Execute the application as configured, without generating output"""
         if not self.config or self.config is None:
             try:
@@ -111,7 +119,7 @@ class Shadow:
             except FileNotFoundError:
                 logger.warning(
                     "No config file present; using shell environment.")
-                self.config = os.environ.copy()
+                self.load_env()
 
         if self.files is None:
             self.discovery.discover_paths()
@@ -124,3 +132,8 @@ class Shadow:
         """Render the discovered templates"""
         renderer = Renderer(self.files, self.config)
         return renderer.render()
+
+    def run(self):
+        """Wrap full functionality"""
+        self.search()
+        self.render()
