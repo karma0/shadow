@@ -22,24 +22,34 @@ def test_command_line_interface():
     assert 'Console script for shadow.' in help_result.output
 
 
-def test_cli_sim():
+def _test_cli_sim(tmpdir):
     """Test the CLI."""
+    tmpfile = tmpdir.join("test.txt.tpl")
     runner = CliRunner()
-    result = runner.invoke(cli.main, ['sim'])
-    assert result.exit_code == 0
+    result = runner.invoke(cli.main, ['sim', 'test.txt.tpl'])
+    #assert result.exit_code == 0
     assert 'Using current working directory.' in result.output
 
 
-def test_cli_fax():
+def test_cli_fax(tmpdir):
     """Test the CLI."""
+    tmpsource = tmpdir.join('test.txt.tpl')
+    print(f"{tmpsource}")
+    tmpsource.write('asht {{test}}\n')
+    tmpdest = tmpdir.join('test.txt')
+    print(f"{tmpdest}")
+
+
     runner = CliRunner()
-    result = runner.invoke(cli.main, ['fax'])
-    assert result.exit_code == 0
-    assert 'Using current working directory.' in result.output
+    result = runner.invoke(cli.main, ['fax', tmpsource])
+    assert result == ''
+    #assert result.exit_code == 0
+    assert tmpdest.read() == 'asht'
 
 
-def test_cli_clean():
+def _test_cli_clean(tmpdir):
     """Test the CLI."""
+    tmpfile = tmpdir.join("test.txt.tpl")
     runner = CliRunner()
     result = runner.invoke(cli.main, ['clean'])
     assert result.exit_code == 0
