@@ -60,7 +60,7 @@ def sim(tmplextension, verbose, quiet, files):
     setup_logger(quiet, verbose)
 
     shadow = Shadow(files, tmplext=tmplextension)
-    for tmpl in shadow.run():
+    for tmpl in shadow.search():
         click.echo("Generating template: "
                    f"{tmpl.source}; output as: {tmpl.destination}")
     return 0
@@ -79,7 +79,7 @@ def clean(tmplextension, verbose, quiet, files):
     setup_logger(quiet, verbose)
 
     shadow = Shadow(files, tmplext=tmplextension)
-    for tmpl in shadow.run():
+    for tmpl in shadow.search():
         if os.path.exists(tmpl[1]):
             click.echo(f"Cleaning generated file: {tmpl.destination}")
             os.remove(tmpl[1])
@@ -89,6 +89,7 @@ def clean(tmplextension, verbose, quiet, files):
 @main.command()
 @click.option('-e', '--environment', is_flag=True, help='Import the '
               'environment for template variable resolution')
+@click.option('-C', '--config', help='JSON configuration string')
 @click.option('-c', '--configfile', help='Configuration (ini, json, hcl, or '
               'env file). Default: shadowconf.<extension>')
 @click.option('-t', '--tmplextension', help='The extension that templates '
@@ -98,18 +99,15 @@ def clean(tmplextension, verbose, quiet, files):
 @click.option('-q', '--quiet', is_flag=True, help='Suppress all but critical '
               'output')
 @click.argument('files', nargs=-1, type=click.Path(exists=True))
-def fax(environment, configfile, tmplextension, verbose, quiet, files):
+def fax(environment, config, configfile, tmplextension, verbose, quiet, files):
     """Render the current tree."""
-    config = None
     if environment:
         config = os.environ.copy()
 
     setup_logger(quiet, verbose)
 
-    shadow = Shadow(paths=files, config=config, configfile=configfile,
-                    tmplext=tmplextension)
+    shadow = Shadow(files, config, configfile, tmplextension)
     shadow.run()
-    shadow.render()
 
     return 0
 

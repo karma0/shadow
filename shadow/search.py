@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Template Search and Discovery Module"""
+"""Template Discovery Module"""
 
 import os
 
@@ -84,7 +84,7 @@ class Explorer:
         logger.debug(f"New Explorer at paths: {paths}")
 
         if not paths or paths is None:
-            logger.warning(f"Using current working directory")
+            logger.warning(f"No path specified. Using current working directory.")
             self.paths = ['.']
         else:
             self.paths = paths

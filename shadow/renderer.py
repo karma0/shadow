@@ -29,13 +29,16 @@ class Renderer:
     def __init__(self, templates, config=None):
         self.tmpls = templates
         self.config = [] if config is None else config
+        logger.debug(f"Launching renderer on templates: {templates}")
 
     def render(self):
         """Primary render action for generating the output."""
         for tmpl in self.tmpls:
 
+            logger.info(f"Running on template: {tmpl.source} to {tmpl.destination}")
+
             # Loop on rendered template destinations
-            for destination in self.render_path(tmpl.destination):
+            for destination, context in self.render_path(tmpl.destination):
 
                 # Bypass bogus destinations
                 if destination is None:
@@ -63,29 +66,32 @@ class Renderer:
         content = env.from_string(destination)
         parsed_content = env.parse(destination)
 
+        logger.debug(f"Rendering destination filename: {destination}")
+
         undefvars = meta.find_undeclared_variables(parsed_content)
         if not undefvars:
-            return [destination]
+            logger.debug(f"Destination filename good as is: {destination}")
+            yield destination, None
 
-        for variable in undefvars:
-            values = self._get_vars(variable)
-            for value in values:
-                if value is not None:
-                    yield content.render({variable: value})
+        else:
+            for variable in undefvars:
+                for confname, value in list(self._get_vars(variable)):
+                    if confname is not None:
+                        yield content.render({variable: confname}), value
 
     def _get_vars(self, variable):
         """Yields variable names in a template."""
         config = self._get_conf_by_path(variable)
         if isinstance(config, list):
             for item in config:
-                yield config
+                yield item, None
         elif isinstance(config, dict):
-            for item in config.keys():
-                yield item
+            for item, conf in config.keys():
+                yield item, conf
         elif isinstance(config, str):
-            yield config
+            yield config, None
         else:
-            yield None
+            yield None, None
 
     def _get_conf_by_path(self, path):
         """Translates a template variable by name to its object in the
