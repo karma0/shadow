@@ -44,7 +44,7 @@ def test_cli_fax(tmpdir):
     result = runner.invoke(cli.main, ['fax', tmpsource])
     assert result == ''
     #assert result.exit_code == 0
-    assert tmpdest.read() == 'asht'
+    assert tmpdest.read() == 'asht '
 
 
 def _test_cli_clean(tmpdir):
