@@ -89,6 +89,7 @@ def clean(tmplextension, verbose, quiet, files):
 @main.command()
 @click.option('-e', '--environment', is_flag=True, help='Import the '
               'environment for template variable resolution')
+@click.option('-C', '--config', help='JSON configuration string')
 @click.option('-c', '--configfile', help='Configuration (ini, json, hcl, or '
               'env file). Default: shadowconf.<extension>')
 @click.option('-t', '--tmplextension', help='The extension that templates '
@@ -98,9 +99,8 @@ def clean(tmplextension, verbose, quiet, files):
 @click.option('-q', '--quiet', is_flag=True, help='Suppress all but critical '
               'output')
 @click.argument('files', nargs=-1, type=click.Path(exists=True))
-def fax(environment, configfile, tmplextension, verbose, quiet, files):
+def fax(environment, config, configfile, tmplextension, verbose, quiet, files):
     """Render the current tree."""
-    config = None
     if environment:
         config = os.environ.copy()
 

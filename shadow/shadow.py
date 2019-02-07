@@ -4,6 +4,7 @@
 
 import re
 import os
+import json
 
 from collections import namedtuple
 from io import StringIO
@@ -48,6 +49,10 @@ class Shadow:
     def __init__(self, paths=None, config=None, configfile=None,
                  tmplext='.tpl'):
         self.paths = [] if paths is None else paths
+
+        if isinstance(config, str):
+            config = json.loads(config)
+
         self.config = config
 
         if config is None:
@@ -81,7 +86,6 @@ class Shadow:
         with open(self.configfile, 'r') as handle:
 
             if ".json" in self.configfile:
-                import json
                 self.config = json.loads(handle.read())
 
             elif ".hcl" in self.configfile:
