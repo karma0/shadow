@@ -51,7 +51,7 @@ setup(
     long_description=readme + '\n\n' + history,
     include_package_data=True,
     keywords='shadow',
-    name='shadow-cli',
+    name='shadowgen',
     packages=find_packages(include=['shadow']),
     setup_requires=setup_requirements,
     test_suite='tests',
