@@ -3,8 +3,8 @@ Shadow
 ======
 
 
-.. image:: https://img.shields.io/pypi/v/shadow-cli.svg
-        :target: https://pypi.python.org/pypi/shadow-cli
+.. image:: https://img.shields.io/pypi/v/shadowgen.svg
+        :target: https://pypi.python.org/pypi/shadowgen
 
 .. image:: https://img.shields.io/travis/karma0/shadow.svg
         :target: https://travis-ci.org/karma0/shadow
@@ -49,7 +49,7 @@ Quick Install
 
 Install from PyPi::
 
-    pip install shadow-cli
+    pip install shadowgen
 
 Install from GitHub::
 
