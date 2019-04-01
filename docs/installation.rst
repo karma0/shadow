@@ -12,7 +12,7 @@ To install Shadow, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install shadow-cli
+    $ pip install shadowgen
 
 This is the preferred method to install Shadow, as it will always install the most recent stable release.
 
