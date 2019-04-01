@@ -68,7 +68,7 @@ class Shadow:
                     logger.info(f"Using config file: {file}")
                     self.configfile = file
 
-            if configfile is None:  # Still not found to be present
+            if self.configfile is None:  # Still not found to be present
                 logger.info("No config file present; using environment")
                 self.load_env()
 

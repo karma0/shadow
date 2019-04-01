@@ -2,6 +2,12 @@
 History
 =======
 
+0.3.1 (2019-04-01)
+------------------
+
+* Renamed PyPi project to shadowgen.
+* Dependency upgrades.
+
 0.3.0 (2019-02-06)
 ------------------
 
