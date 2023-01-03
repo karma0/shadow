@@ -2,7 +2,7 @@ pip==19.3
 bumpversion==0.5.3
 flake8==3.7.8
 wheel==0.33.6
-coverage==4.5.4
+coverage==7.0.2
 tox==3.14.0
 pytest-runner==5.1
 Sphinx==2.2.0
